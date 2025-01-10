@@ -69,9 +69,10 @@ def upload_csv_or_xlsx():
         # Process the 'textDisplay' data kolom
         df['textDisplay'] = df['textDisplay'].fillna('').astype(str)
         df['sentiment_before'] = sentiment.predict(df['textDisplay'])
-        df['sarcasm_prediction'] = sarcasm.predict(df['textDisplay'])[0]
+        df['sarcasm_prediction'] = sarcasm.predict(df['textDisplay'])
         df['sentiment_result'] = sentiment_after_sarcasm.predict(df['textDisplay'])
 
+        df = df.head(5)
 
         # Store the processed data globally
         analyzed_data = df
