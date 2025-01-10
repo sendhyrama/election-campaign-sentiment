@@ -1,317 +1,185 @@
 <!DOCTYPE html>
-<html lang="id">
-  <head>
+<html lang="id" class="h-full bg-gray-50">
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Deteksi Sarkasme dan Sentimen</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-        text-align: center;
-      }
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="min-h-full">
+        <div class="bg-white shadow">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold text-center tracking-tight text-gray-900">Klasifikasi Sentimen dengan Deteksi Sarkasme</h1>
+            </div>
+        </div>
 
-      .container {
-        width: 80%;
-        margin: 0 auto;
-        padding: 20px;
-      }
+        <main>
+            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+                <!-- Text Analysis Form -->
+                <div class="bg-white shadow sm:rounded-lg mb-6">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h2 class="text-xl text-center font-semibold mb-4">Analisis Teks</h2>
+                        <form id="textAnalysisForm" class="space-y-4">
+                            <div>
+                                <input type="text" name="textInput" id="textInput" 
+                                    class="block w-full rounded-md border-0 px-4 py-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm"
+                                    placeholder="Masukkan teks untuk analisis" required />
+                            </div>
+                            <div class="flex justify-center">
+                                <button type="submit" 
+                                    class="inline-flex justify-center rounded-md bg-green-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600">
+                                    Proses Teks
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Results Container -->
+                        <div id="textAnalysisResult" class="mt-6 hidden">
+                            <div class="rounded-md bg-gray-50 p-4 text-center">
+                                <h3 class="text-lg font-medium text-gray-900 mb-3">Hasil Deteksi</h3>
+                                <div id="resultContent" class="space-y-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-      header h1 {
-        font-size: 36px;
-        color: #333;
-        margin-bottom: 20px;
-      }
+                <!-- File Upload Form -->
+                <div class="bg-white shadow sm:rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h2 class="text-xl text-center font-semibold mb-4">Analisis Teks dari File (CSV / Excel)</h2>
+                        <form id="fileUploadForm" class="space-y-4">
+                            <div class="flex items-center justify-center gap-4">
+                                <input type="file" name="File" id="File" accept=".csv,.xlsx"
+                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" required />
+                                <button type="button" id="clearFileButton" onclick="clearFileInput()"
+                                    class="hidden rounded-md bg-red-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">
+                                    Clear
+                                </button>
+                            </div>
+                            <div class="flex justify-center">
+                                <button type="submit"
+                                    class="inline-flex justify-center rounded-md bg-green-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600">
+                                    Upload dan Proses File
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-      .form-container,
-      .upload-container {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin: 20px 0;
-      }
-
-      input[type="text"],
-      input[type="file"] {
-        width: 80%;
-        padding: 10px;
-        font-size: 16px;
-        margin: 10px 0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-
-      button {
-        background-color: #4caf50;
-        color: white;
-        padding: 10px 20px;
-        font-size: 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: #45a049;
-      }
-
-      footer {
-        margin-top: 50px;
-        font-size: 14px;
-        color: #777;
-      }
-
-      .result-container {
-        margin-top: 20px;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
-
-      .result-container h2 {
-        font-size: 24px;
-        color: #333;
-      }
-
-      .result-container p {
-        font-size: 18px;
-        color: #555;
-      }
-
-      .clear-button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #d9534f;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      .clear-button:hover {
-        background-color: #c9302c;
-      }
-
-      /* New loading overlay styles */
-      .loading-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.9);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-      }
-
-      .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #4caf50;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      .loading-text {
-        margin-top: 20px;
-        font-size: 18px;
-        color: #333;
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
-      /* Progress bar styles */
-      .progress-bar {
-        width: 200px;
-        height: 4px;
-        background-color: #f3f3f3;
-        border-radius: 2px;
-        margin-top: 15px;
-        overflow: hidden;
-      }
-
-      .progress-bar-fill {
-        height: 100%;
-        background-color: #4caf50;
-        width: 0%;
-        transition: width 0.3s ease;
-        animation: progress 2s ease-in-out infinite;
-      }
-
-      @keyframes progress {
-        0% { width: 0%; }
-        50% { width: 70%; }
-        100% { width: 100%; }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="loading-overlay" id="loadingOverlay">
-      <div class="spinner"></div>
-      <div class="progress-bar">
-        <div class="progress-bar-fill"></div>
-      </div>
-      <div class="loading-text">Memproses File...</div>
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center">
+            <div class="bg-white rounded-lg p-8 flex flex-col items-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent"></div>
+                <div class="mt-4 text-lg font-medium text-gray-900">Memproses File...</div>
+                <div class="w-48 h-1 bg-gray-200 rounded-full mt-4 overflow-hidden">
+                    <div class="h-full bg-green-600 rounded-full animate-progress"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="container">
-      <header>
-        <h1>Klasifikasi Sentimen dengan Deteksi Sarkasme</h1>
-      </header>
-
-      <div class="form-container">
-        <h2>Analisis Teks</h2>
-        <form id="textAnalysisForm">
-          <input
-            type="text"
-            name="textInput"
-            id="textInput"
-            placeholder="Masukkan teks untuk analisis"
-            required
-          />
-          <br />
-          <button type="submit">Proses Teks</button>
-        </form>
-        <div id="textAnalysisResult" class="result-container" style="display: none;"></div>
-      </div>
-
-      <div class="upload-container">
-        <h2>Analisis Teks dari File (CSV / Excel)</h2>
-        <form id="fileUploadForm" enctype="multipart/form-data">
-          <div class="file-input-wrapper">
-            <input
-              type="file"
-              name="File"
-              id="File"
-              accept=".csv,.xlsx"
-              placeholder="Pilih file CSV atau XLSX"
-              required
-            />
-            <button
-              type="button"
-              class="clear-button"
-              id="clearFileButton"
-              onclick="clearFileInput()"
-              aria-label="Clear file input"
-              style="display: none;"
-            >
-              Clear
-            </button>
-          </div>
-          <br />
-          <button type="submit">Upload dan Proses File</button>
-        </form>
-      </div>
-    </div>
-
-    <footer>
-      <p>
-        &copy; Klasifikasi Sentimen dengan Deteksi Sarkasme pada Komentar
-        Youtube Pilkada 2024
-      </p>
+    <footer class="bg-white border-t mt-8">
+        <div class="mx-auto max-w-7xl px-4 py-6 text-center text-sm text-gray-500">
+            &copy; Klasifikasi Sentimen dengan Deteksi Sarkasme pada Komentar Youtube Pilkada 2024
+        </div>
     </footer>
 
-    <script>
-      document
-        .getElementById("textAnalysisForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const textInput = document.getElementById("textInput").value;
-          const resultContainer = document.getElementById("textAnalysisResult");
-
-          resultContainer.style.display = "block";
-          resultContainer.innerHTML = "<h2>Hasil Deteksi</h2><p>Memproses...</p>";
-
-          try {
-            const response = await fetch("/process_text", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ textInput }),
-            });
-
-            if (response.ok) {
-              const result = await response.json();
-              resultContainer.innerHTML = `
-                <h2>Hasil Deteksi</h2>
-                <p><strong>Hasil Sentimen Sebelum:</strong> ${result.sentiment_sebelum}</p>
-                <p><strong>Hasil Sentimen:</strong> ${result.sentimen}</p>
-                <p><strong>Prediksi Sarkasme:</strong> ${result.sarcasm}</p>
-                <p><strong>Teks yang Dianalisis:</strong> ${result.text}</p>
-                <button class="clear-button" onclick="clearResult()">Clear</button>
-              `;
-            } else {
-              const error = await response.json();
-              resultContainer.innerHTML = `<h2>Hasil Deteksi</h2><p>Error: ${error.error}</p>`;
-            }
-          } catch (err) {
-            resultContainer.innerHTML = `<h2>Hasil Deteksi</h2><p>Error: ${err.message}</p>`;
-          }
-        });
-
-      document
-        .getElementById("fileUploadForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const formData = new FormData(this);
-          const loadingOverlay = document.getElementById("loadingOverlay");
-
-          try {
-            loadingOverlay.style.display = "flex";
-
-            const response = await fetch("/upload_file", {
-              method: "POST",
-              body: formData
-            });
-
-            if (!response.ok) {
-              loadingOverlay.style.display = "none";
-              const errorText = await response.text();
-              alert(errorText);
-              return;
-            }
-
-            window.location.href = '/results';
-          } catch (error) {
-            loadingOverlay.style.display = "none";
-            alert("Error uploading file: " + error.message);
-          }
-        });
-
-      function clearResult() {
-        const resultContainer = document.getElementById("textAnalysisResult");
-        resultContainer.style.display = "none";
-        resultContainer.innerHTML = "";
-        document.getElementById("textInput").value = "";
-      }
-
-      const fileInput = document.getElementById("File");
-      const clearFileButton = document.getElementById("clearFileButton");
-
-      fileInput.addEventListener("change", () => {
-        if (fileInput.value) {
-          clearFileButton.style.display = "inline-block";
-        } else {
-          clearFileButton.style.display = "none";
+    <style>
+        @keyframes progress {
+            0% { width: 0% }
+            50% { width: 70% }
+            100% { width: 100% }
         }
-      });
+        .animate-progress {
+            animation: progress 2s ease-in-out infinite;
+        }
+    </style>
 
-      function clearFileInput() {
-        fileInput.value = "";
-        clearFileButton.style.display = "none";
-      }
+    <script>
+        document.getElementById("textAnalysisForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const textInput = document.getElementById("textInput").value;
+            const resultContainer = document.getElementById("textAnalysisResult");
+            const resultContent = document.getElementById("resultContent");
+
+            resultContainer.classList.remove("hidden");
+            resultContent.innerHTML = "<p class='text-gray-600'>Memproses...</p>";
+
+            try {
+                const response = await fetch("/process_text", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ textInput }),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    resultContent.innerHTML = `
+                        <div class="flex flex-col items-center">
+                            <p class="text-gray-700"><span class="font-medium">Hasil Sentimen Sebelum:</span> ${result.sentiment_sebelum}</p>
+                            <p class="text-gray-700"><span class="font-medium">Hasil Sentimen:</span> ${result.sentimen}</p>
+                            <p class="text-gray-700"><span class="font-medium">Prediksi Sarkasme:</span> ${result.sarcasm}</p>
+                            <p class="text-gray-700"><span class="font-medium">Teks yang Dianalisis:</span> ${result.text}</p>
+                            <button onclick="clearResult()" class="mt-4 rounded-md bg-red-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500">Clear</button>
+                        </div>
+                    `;
+                } else {
+                    const error = await response.json();
+                    resultContent.innerHTML = `<p class="text-red-600">Error: ${error.error}</p>`;
+                }
+            } catch (err) {
+                resultContent.innerHTML = `<p class="text-red-600">Error: ${err.message}</p>`;
+            }
+        });
+
+        document.getElementById("fileUploadForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const loadingOverlay = document.getElementById("loadingOverlay");
+
+            try {
+                loadingOverlay.style.display = "flex";
+                const response = await fetch("/upload_file", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    loadingOverlay.style.display = "none";
+                    const errorText = await response.text();
+                    alert(errorText);
+                    return;
+                }
+
+                window.location.href = '/results';
+            } catch (error) {
+                loadingOverlay.style.display = "none";
+                alert("Error uploading file: " + error.message);
+            }
+        });
+
+        function clearResult() {
+            const resultContainer = document.getElementById("textAnalysisResult");
+            const resultContent = document.getElementById("resultContent");
+            resultContainer.classList.add("hidden");
+            resultContent.innerHTML = "";
+            document.getElementById("textInput").value = "";
+        }
+
+        const fileInput = document.getElementById("File");
+        const clearFileButton = document.getElementById("clearFileButton");
+
+        fileInput.addEventListener("change", () => {
+            clearFileButton.style.display = fileInput.value ? "inline-block" : "none";
+        });
+
+        function clearFileInput() {
+            fileInput.value = "";
+            clearFileButton.style.display = "none";
+        }
     </script>
-  </body>
+</body>
 </html>

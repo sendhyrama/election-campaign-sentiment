@@ -1,106 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hasil Analisis Sentimen</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            margin-top: 50px;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        /* Table Styles */
-        .table-container {
-            margin-top: 20px;
-        }
-
-        th {
-            font-weight: bold;
-            text-align: center;
-            background-color: #4caf50;
-            color: black;
-        }
-
-        td {
-            text-align: left;
-        }
-
-        /* Button Styles */
-        .btn-primary {
-            background-color: #4caf50;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #45a049;
-        }
-
-        /* Custom styles for the layout */
-        .search-nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .back-button {
-            width: 200px;
-        }
-
-        .search-input {
-            width: 250px;
-            margin: 0 15px;
-        }
-
-        .download-button {
-            width: 200px;
-            display: block;
-            margin-left: auto;
-            margin-right: 0;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-center">Hasil Analisis Sentimen</h1>
-
-        <div class="search-nav-container">
-            <a href="/" class="btn btn-secondary back-button" onclick="resetPage()">Kembali ke Beranda</a>
-            <input type="text" id="searchInput" class="form-control search-input" placeholder="Cari kata kunci" />
-        </div>
-
-        <div class="text-end mb-3">
-            <a href="/download_processed_file" class="btn btn-primary download-button">
-                Download File CSV
-            </a>
-        </div>
-
-        <div class="row table-container">
-            <div class="col table-responsive">
-                {{ tables|safe }}
+<body class="h-full">
+    <div class="min-h-full">
+        <div class="bg-white shadow">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold tracking-tight text-center text-gray-900">Hasil Analisis Sentimen</h1>
             </div>
         </div>
+
+        <main>
+            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+                <div class="sm:flex sm:items-center sm:justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <a href="/" class="inline-flex items-center rounded-md bg-gray-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600">
+                            Kembali ke Beranda
+                        </a>
+                        <input type="text" id="searchInput" 
+                            class="block rounded-md border-0 py-2.5 pl-4 pr-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm"
+                            placeholder="Cari kata kunci" />
+                    </div>
+                    <a href="/download_processed_file" 
+                        class="mt-4 sm:mt-0 inline-flex items-center rounded-md bg-green-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600">
+                        Download File CSV
+                    </a>
+                </div>
+
+                <div class="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg">
+                    <div class="overflow-x-auto">
+                        {{ tables|safe }}
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Script search kata kunci -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const searchInput = document.getElementById("searchInput");
             const table = document.querySelector("table");
+            
+            table.classList.add("min-w-full", "divide-y", "divide-gray-300");
+            
+            // Style table headers
+            const thead = table.querySelector("thead");
+            thead.classList.add("bg-blue-100");
+            thead.querySelectorAll("th").forEach(th => {
+                th.classList.add(
+                    "px-6",
+                    "py-3.5",
+                    "text-left",
+                    "text-sm",
+                    "font-semibold",
+                    "text-gray-900"
+                );
+            });
+            
+            // Style table cells with text wrapping
+            table.querySelectorAll("tbody tr").forEach(tr => {
+                tr.classList.add("even:bg-gray-50");
+                tr.querySelectorAll("td").forEach(td => {
+                    td.classList.add(
+                        "px-6",
+                        "py-4",
+                        "text-sm",
+                        "text-gray-500",
+                        "align-top", 
+                        "break-words", 
+                        "whitespace-normal", 
+                        "max-w-md" 
+                    );
+                });
+            });
+
+            // style responsive columns
+            const headerCells = thead.querySelectorAll("th");
+            headerCells.forEach(th => {
+                if (th.textContent.toLowerCase().includes("text") || 
+                    th.textContent.toLowerCase().includes("komentar")) {
+                    th.classList.add("w-1/2"); 
+                } else {
+                    th.classList.add("w-auto");
+                }
+            });
 
             searchInput.addEventListener("input", function () {
                 const filter = searchInput.value.toLowerCase();
@@ -121,6 +108,23 @@
                 }
             });
         });
+
+        // style table responsive
+        const style = document.createElement('style');
+        style.textContent = `
+            @media (max-width: 768px) {
+                td, th {
+                    min-width: 120px; /* Minimum width for columns */
+                }
+                td:nth-child(1), th:nth-child(1) {
+                    position: sticky;
+                    left: 0;
+                    background: inherit;
+                    z-index: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
