@@ -33,7 +33,7 @@ def process_text():
         # Predictions
         sarcasm_prediction = sarcasm.predict([text])[0]
         sentiment_sebelum = sentiment.predict([text])[0]
-        sentiment_prediction = sentiment_after_sarcasm.fit(None, None).predict([text])[0]
+        sentiment_prediction = sentiment_after_sarcasm.predict([text])[0]
 
         return jsonify({
             "sentiment_sebelum": sentiment_sebelum,
@@ -68,9 +68,10 @@ def upload_csv_or_xlsx():
 
         # Process the 'textDisplay' data kolom
         df['textDisplay'] = df['textDisplay'].fillna('').astype(str)
-        df['sentiment_result'] = sentiment.predict(df['textDisplay'])
-        df['sarcasm_prediction'] = sarcasm.predict(df['textDisplay'])
-        df['final_sentiment'] = sentiment_after_sarcasm.fit(None, None).predict(df['textDisplay'])
+        df['sentiment_before'] = sentiment.predict(df['textDisplay'])
+        df['sarcasm_prediction'] = sarcasm.predict(df['textDisplay'])[0]
+        df['sentiment_result'] = sentiment_after_sarcasm.predict(df['textDisplay'])
+
 
         # Store the processed data globally
         analyzed_data = df
